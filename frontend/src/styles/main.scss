@@ -1,0 +1,39 @@
+// ═══════════════════════════════════════════════════════════
+//  main.scss — Single entry point for the design system
+//
+//  Theme switching:
+//    Light (default) — :root CSS custom properties
+//    Dark            — [data-theme="dark"] overrides
+//
+//  Usage in JS:
+//    document.documentElement.setAttribute('data-theme', 'dark');
+//    document.documentElement.removeAttribute('data-theme');
+// ═══════════════════════════════════════════════════════════
+
+// 1. Tokens & helpers (no output until used)
+@use 'variables';
+@use 'mixins';
+
+// 2. Foundations
+@use 'base';
+@use 'typography';
+@use 'compat';
+@use 'ui';
+
+// 3. Components
+@use 'components/navbar';
+@use 'components/buttons';
+@use 'components/cards';
+@use 'components/forms';
+@use 'components/badge';
+@use 'components/banner';
+
+// 4. Pages
+@use 'pages/home';
+@use 'pages/shop';
+@use 'pages/product';
+@use 'pages/cart';
+@use 'pages/checkout';
+@use 'pages/auth';
+@use 'pages/dashboard';
+@use 'pages/admin';

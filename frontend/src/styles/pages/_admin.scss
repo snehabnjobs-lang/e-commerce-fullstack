@@ -1,0 +1,177 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ─── Admin layout ─────────────────────────────
+.admin-page {
+  @include container;
+  padding-block: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// ─── Admin top bar ────────────────────────────
+.admin-topbar {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .admin-page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .admin-actions {
+    @include flex($gap: 0.75rem);
+    flex-wrap: wrap;
+  }
+}
+
+// ─── Stat cards row ───────────────────────────
+.admin-stats {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+// ─── Table wrapper ────────────────────────────
+.admin-table-wrapper {
+  @include surface;
+  overflow: hidden;
+  overflow-x: auto;
+  @include scrollbar;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead {
+    background-color: var(--table-head-bg);
+
+    th {
+      padding: 0.875rem 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--table-border);
+      white-space: nowrap;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--table-border);
+    transition: background-color var(--transition-fast);
+
+    &:last-child { border-bottom: none; }
+    &:hover { background-color: var(--table-row-hover); }
+
+    td {
+      padding: 0.875rem 1rem;
+      color: var(--text-secondary);
+      vertical-align: middle;
+
+      &:first-child { color: var(--text-primary); font-weight: 600; }
+    }
+  }
+
+  .table-actions {
+    @include flex($gap: 0.5rem);
+    flex-wrap: nowrap;
+  }
+}
+
+// ─── Product image in table ───────────────────
+.table-thumb {
+  width: 3rem;
+  height: 3rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface-alt);
+}
+
+// ─── Admin form (add/edit product) ────────────
+.admin-form {
+  @include surface;
+  padding: 2rem;
+  max-width: 50rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .form-row {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+
+    @include sm { grid-template-columns: 1fr 1fr; }
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+
+    &:last-of-type { border-bottom: none; }
+
+    .form-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+  }
+}
+
+// ─── Image upload drop zone ───────────────────
+.image-dropzone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface-alt);
+  padding: 2.5rem;
+  @include flex(column, center, center, 0.75rem);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+
+  &:hover,
+  &.drag-over {
+    border-color: var(--brand-primary);
+    background-color: var(--brand-primary-light);
+  }
+
+  .dropzone-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--text-muted);
+  }
+
+  .dropzone-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .dropzone-hint {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  input[type='file'] { @include visually-hidden; }
+}
+
+// ─── Orders management ────────────────────────
+.orders-filter {
+  @include flex($gap: 0.75rem);
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}

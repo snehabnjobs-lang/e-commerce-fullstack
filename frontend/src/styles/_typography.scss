@@ -1,0 +1,84 @@
+@use 'variables' as *;
+
+// ─── Scale ────────────────────────────────────
+.text-xs   { font-size: 0.75rem;   line-height: 1rem;    }
+.text-sm   { font-size: 0.875rem;  line-height: 1.25rem; }
+.text-base { font-size: 1rem;      line-height: 1.5rem;  }
+.text-lg   { font-size: 1.125rem;  line-height: 1.75rem; }
+.text-xl   { font-size: 1.25rem;   line-height: 1.75rem; }
+.text-2xl  { font-size: 1.5rem;    line-height: 2rem;    }
+.text-3xl  { font-size: 1.875rem;  line-height: 2.25rem; }
+.text-4xl  { font-size: 2.25rem;   line-height: 2.5rem;  }
+
+// ─── Weight ───────────────────────────────────
+.font-normal   { font-weight: 400; }
+.font-medium   { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold     { font-weight: 700; }
+.font-extrabold{ font-weight: 800; }
+
+// ─── Color tokens ─────────────────────────────
+.text-primary   { color: var(--text-primary);   }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted);     }
+.text-link      { color: var(--text-link);      }
+.text-success   { color: var(--success);        }
+.text-warning   { color: var(--warning);        }
+.text-danger    { color: var(--danger);         }
+.text-info      { color: var(--info);           }
+.text-brand     { color: var(--brand-primary);  }
+
+// ─── Headings ─────────────────────────────────
+.heading-hero {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.heading-section {
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.heading-card {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+// ─── Body copy ────────────────────────────────
+.body-lead {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.body-sm {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.caption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+// ─── Code / mono ──────────────────────────────
+code, kbd, samp, pre {
+  font-family: $font-mono;
+  font-size: 0.875em;
+}
+
+code {
+  background: var(--bg-surface-alt);
+  color: var(--brand-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--border-color);
+}

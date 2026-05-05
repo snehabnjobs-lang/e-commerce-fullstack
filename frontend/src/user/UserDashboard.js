@@ -2,60 +2,60 @@ import React from "react";
 import Layout from "../core/Layout";
 import { isAuthenticated } from "../auth";
 import { Link } from 'react-router-dom';
+import PurchaseHistory from "./PurchaseHistory";
 
 function Dashboard() {
     const { user: { _id, name, email, role } } = isAuthenticated();
 
-    const userLinks = () => {
-        return (
-            <div>
-                <h4>User links</h4>
-                <ul>
-                    <li>
-                        <Link to="/cart">Cart</Link>
-                    </li>
-                    {/* <li>
-                        <Link to="/profile/update">Update Profile</Link>
-                    </li> */}
-                    <li>
-                        <Link to={`/profile/${_id}`}>Update Profile</Link>
-                    </li>
-                    <li>
-                        <Link to={`/purchase-history`}>Purchase History</Link>
-                    </li>
-                </ul>
-
-            </div >
-        )
-    }
-
-    const userInfo = () => {
-        return (
-            <div>
-                <h3>User Information</h3>
-                name: {name}
-                email: {email}
-                role: {role === 1 ? 'Admin' : 'Registered User'}
-            </div>
-        )
-    }
-
-    const history = () => {
-        return (
-            <div className="history">
-                <h2>history</h2>
-            </div>
-        )
-    }
     return (
         <Layout>
-            <div className="row">
-                {userLinks()}
-                {userInfo()}
-                {history()}
+            <div className="page-content">
+                <div className="dashboard-page">
+                    <aside className="dashboard-sidebar">
+                        <div className="sidebar-avatar-block">
+                            <div className="sidebar-avatar" style={{
+                                background: 'var(--brand-primary)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: '#fff', fontSize: '1.5rem', fontWeight: 800
+                            }}>
+                                {name?.[0]?.toUpperCase()}
+                            </div>
+                            <span className="sidebar-name">{name}</span>
+                            <span className="sidebar-email">{email}</span>
+                        </div>
+                        <nav>
+                            <Link to="/cart">🛒 Cart</Link>
+                            <Link to={`/profile/${_id}`}>👤 Update Profile</Link>
+                            <Link to="/purchase-history" className="active">📦 Purchase History</Link>
+                        </nav>
+                    </aside>
+
+                    <div className="dashboard-main">
+                        <div className="profile-form">
+                            <h2 className="dashboard-section-title">Account Info</h2>
+                            <div className="form-group">
+                                <label className="form-label">Name</label>
+                                <input className="form-control" value={name} readOnly />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input className="form-control" value={email} readOnly />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Role</label>
+                                <input className="form-control" value={role === 1 ? 'Admin' : 'Registered User'} readOnly />
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 className="dashboard-section-title">Purchase History</h2>
+                            <PurchaseHistory />
+                        </div>
+                    </div>
+                </div>
             </div>
         </Layout>
-    )
+    );
 }
 
 export default Dashboard;

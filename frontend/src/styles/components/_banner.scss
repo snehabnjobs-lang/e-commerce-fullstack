@@ -1,0 +1,83 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ─── Hero / Banner ────────────────────────────
+.banner {
+  position: relative;
+  width: 100%;
+  min-height: 28rem;
+  background-color: var(--bg-secondary);
+  overflow: hidden;
+  @include flex-center;
+
+  &.bg-banner {
+    background-image: url('../../images/banner.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+
+// Dark overlay so text is readable on image backgrounds
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+}
+
+.banner-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  max-width: 48rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.banner-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+}
+
+.banner-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  max-width: 32rem;
+}
+
+.banner-cta {
+  @include flex($gap: 0.75rem);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+// ─── Minimal promo strip ──────────────────────
+.promo-strip {
+  background-color: var(--brand-primary);
+  color: var(--text-on-brand);
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    margin-left: 0.5rem;
+    opacity: 0.9;
+
+    &:hover { opacity: 1; }
+  }
+}

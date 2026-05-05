@@ -1,0 +1,83 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ─── Base badge ───────────────────────────────
+.badge { @include badge; }
+
+// ─── Semantic variants ────────────────────────
+.badge-success {
+  @include badge(var(--badge-success-bg), var(--badge-success-text));
+}
+
+.badge-danger {
+  @include badge(var(--badge-danger-bg), var(--badge-danger-text));
+}
+
+.badge-warning {
+  @include badge(var(--badge-warn-bg), var(--badge-warn-text));
+}
+
+.badge-info {
+  @include badge(var(--brand-primary-light), var(--brand-primary));
+}
+
+.badge-primary {
+  @include badge(var(--brand-primary), var(--text-on-brand));
+}
+
+// ─── Out of stock indicator ───────────────────
+.badge-out-of-stock {
+  @include badge(var(--badge-danger-bg), var(--badge-danger-text));
+}
+
+// ─── Price pill ───────────────────────────────
+.price-pill {
+  @include badge(var(--badge-bg), var(--badge-text));
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+// ─── Category chip ────────────────────────────
+.chip {
+  @include badge(var(--bg-surface-alt), var(--text-secondary));
+  border: 1px solid var(--border-color);
+  cursor: default;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+
+  &:hover,
+  &.active {
+    background-color: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+  }
+}
+
+// ─── Notification dot ────────────────────────
+.dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+
+  &.dot-success  { background-color: var(--success); }
+  &.dot-danger   { background-color: var(--danger);  }
+  &.dot-warning  { background-color: var(--warning); }
+  &.dot-primary  { background-color: var(--brand-primary); }
+}
+
+// ─── Status label (orders) ────────────────────
+.status-badge {
+  @include flex($gap: 0.375rem);
+  display: inline-flex;
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  &.pending   { @extend .badge-warning; }
+  &.shipped   { @extend .badge-info;    }
+  &.delivered { @extend .badge-success; }
+  &.cancelled { @extend .badge-danger;  }
+}

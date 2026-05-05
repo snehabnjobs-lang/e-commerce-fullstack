@@ -6,67 +6,64 @@ import { getProducts, deleteProduct } from "../api/admin";
 
 const ManageProducts = () => {
     const [products, setProducts] = useState([]);
-
     const { user, token } = isAuthenticated();
 
     const loadProducts = () => {
         getProducts().then(data => {
-            if (data.error) {
-                console.log(data.error);
-            } else {
-                setProducts(data.data);
-            }
+            if (!data.error) setProducts(data.data);
         });
     };
 
     const destroy = productId => {
         deleteProduct(productId, user._id, token).then(data => {
-            if (data.error) {
-                console.log(data.error);
-            } else {
-                loadProducts();
-            }
+            if (!data.error) loadProducts();
         });
     };
 
-    useEffect(() => {
-        loadProducts();
-    }, []);
+    useEffect(() => { loadProducts(); }, []);
 
     return (
-        <Layout
-            title="Manage Products"
-            description="Perform CRUD on products"
-            className="container-fluid"
-        >
-            <div className="row">
-                <div className="col-12">
-                    <h2 className="text-center">
-                        Total {products.length} products
-                    </h2>
-                    <hr />
-                    <ul className="list-group">
-                        {products?.map((p, i) => (
-                            <li
-                                key={i}
-                                className="list-group-item d-flex justify-content-between align-items-center"
-                            >
-                                <strong>{p.name}</strong>
-                                <Link to={`/admin/product/update/${p._id}`}>
-                                    <span className="badge badge-warning badge-pill">
-                                        Update
-                                    </span>
-                                </Link>
-                                <span
-                                    onClick={() => destroy(p._id)}
-                                    className="badge badge-danger badge-pill"
-                                >
-                                    Delete
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                    <br />
+        <Layout>
+            <div className="page-content">
+                <div className="admin-topbar">
+                    <h2 className="admin-page-title">Manage Products</h2>
+                    <div className="admin-actions">
+                        <Link to="/admin/product/create" className="btn-primary">+ Add Product</Link>
+                    </div>
+                </div>
+
+                <div className="admin-table-wrapper" style={{ marginTop: '1.5rem' }}>
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {products.map((p, i) => (
+                                <tr key={i}>
+                                    <td><strong>{p.name}</strong></td>
+                                    <td>
+                                        <div className="table-actions">
+                                            <Link to={`/admin/product/update/${p._id}`} className="btn-secondary btn-sm">
+                                                Edit
+                                            </Link>
+                                            <button className="btn-danger btn-sm" onClick={() => destroy(p._id)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {products.length === 0 && (
+                        <p className="text-muted text-center" style={{ padding: '2rem' }}>
+                            No products yet.
+                        </p>
+                    )}
                 </div>
             </div>
         </Layout>

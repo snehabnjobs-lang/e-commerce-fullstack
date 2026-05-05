@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import { Button, Input, Select, Textarea } from '@chakra-ui/react'
-
 import { useUserData } from "../hooks/useAuth";
 import Layout from "../core/Layout";
 import { createProduct, getCategories } from '../api/admin';
@@ -10,181 +8,121 @@ function AddProduct() {
     const { user, token } = useUserData();
     const [isLoading, setIsLoading] = useState(false);
     const [categories, setCategories] = useState([]);
-
     const formData = useRef(new FormData());
 
-    const initialValues = {
-        name: '',
-        description: '',
-        photo: '',
-        price: '',
-        quantity: '',
-        category: '',
-        shipping: '',
-        error: '',
-        formData: ''
-    }
     const [values, setValues] = useState({
-        ...initialValues,
-        createdProduct: '',
-        redirectToProfile: false,
+        name: '', description: '', price: '', quantity: '',
+        category: '', shipping: '', error: '', createdProduct: '',
     });
 
-    const {
-        name,
-        description,
-        price,
-        photo,
-        category,
-        shipping,
-        quantity,
-        error,
-        createdProduct,
-        redirectToProfile,
-
-    } = values;
-
-    const loadCategories = () => {
-        getCategories({ token })
-            .then((data) => {
-                setCategories(data)
-            })
-    }
+    const { name, description, price, category, shipping, quantity, error, createdProduct } = values;
 
     useEffect(() => {
-        loadCategories()
-    }, []);
+        getCategories({ token }).then((data) => { if (!data.error) setCategories(data); });
+    }, [token]);
+
+    const handleChange = (field) => (event) => {
+        const value = field === 'photo' ? event.target.files[0] : event.target.value;
+        formData.current.set(field, value);
+        setValues(prev => ({ ...prev, [field]: value }));
+    };
 
     const clickSubmit = (e) => {
         e.preventDefault();
-        setValues({ ...values, error: '' });
+        setValues(prev => ({ ...prev, error: '' }));
         setIsLoading(true);
-        console.log("formData", formData.current);
-
-        // make API Call
-        createProduct(user._id, token, formData.current)
-            .then((data) => {
-                setIsLoading(false);
-                if (data.error) {
-                    setValues({ ...values, error: data.error })
-                } else if (data.result) {
-                    setValues({
-                        name: '',
-                        description: '',
-                        photo: '',
-                        price: '',
-                        quantity: '',
-                        category: '',
-                        shipping: '',
-                        loading: false,
-                        error: '',
-                        formData: new FormData(),
-                        createdProduct: data.result.name
-                    })
-                }
-            })
-    }
-
-    const handleChange = (name) => (event) => {
-        const data = name === 'photo' ? event.target.files[0] : event.target.value;
-        formData.current.set(name, data);
-        setValues({ ...values, [name]: data });
-    }
-
-    const showSuccess = () => {
-        return (
-            <div style={{ display: createdProduct ? '' : 'none' }}>
-                <h2>{`${createdProduct} is created!`}</h2>
-            </div>
-        )
-    }
-
-    const showError = () => {
-        return (
-            <div style={{ display: error ? '' : 'none' }}>
-                <h2>{error}</h2>
-            </div>
-        )
-    }
-
-    const goBack = () => (
-        <div>
-            <Link to="/admin/dashboard">Back to Admin Dashboard</Link>
-        </div>
-    )
-
-    const newProductForm = () => (
-        <form className="p-10 text-lg" onSubmit={clickSubmit}>
-            <div>
-                <label className="">Upload Photo</label>
-                <input type="file"
-                    className="btn bg-slate-200 p-2" name="photo"
-                    onChange={handleChange('photo')}
-                    value={undefined}
-                    accept="image/*" />
-
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Name</label>
-                <Input type="text" className="" onChange={handleChange('name')} value={name} />
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Description</label>
-                <Textarea type="text" className="" onChange={handleChange('description')} value={description} />
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Price</label>
-                <Input type="number" className="" onChange={handleChange('price')} value={price} />
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Category</label>
-                <Select
-                    className=""
-                    onChange={handleChange('category')}
-                    value={category}
-                >
-                    <option>Please Select</option>
-                    {categories?.map((category, index) => (
-                        <option key={`${category}_index`} value={category._id}>{category.name}</option>
-                    ))}
-                </Select>
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Quantity</label>
-                <Input type="text" className="" onChange={handleChange('quantity')} value={quantity} />
-            </div>
-
-            <div className="py-2">
-                <label className="font-bold">Shipping ?</label>
-                <Select
-                    className=""
-                    onChange={handleChange('shipping')}
-                    value={shipping}
-                >
-                    <option>Please Select</option>
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </Select>
-            </div>
-
-            <Button disabled={!isLoading} className="btn" type="submit">Create Product</Button>
-        </form>
-    )
+        createProduct(user._id, token, formData.current).then((data) => {
+            setIsLoading(false);
+            if (data.error) {
+                setValues(prev => ({ ...prev, error: data.error }));
+            } else if (data.result) {
+                setValues({ name: '', description: '', price: '', quantity: '', category: '', shipping: '', error: '', createdProduct: data.result.name });
+                formData.current = new FormData();
+            }
+        });
+    };
 
     return (
         <Layout>
-            {goBack()}
-            {isLoading ? "Loading......" : null}
-            {showSuccess()}
-            {showError()}
-            {newProductForm()}
+            <div className="page-content">
+                <div className="admin-form">
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <Link to="/admin/dashboard" className="text-muted" style={{ fontSize: '0.875rem' }}>
+                            ← Back to Dashboard
+                        </Link>
+                        <h2 style={{ marginTop: '0.5rem', fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                            Add Product
+                        </h2>
+                    </div>
+
+                    {createdProduct && (
+                        <div className="alert alert-success">
+                            <strong>{createdProduct}</strong> was created successfully!
+                        </div>
+                    )}
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    {isLoading && <div className="alert alert-info">Creating product…</div>}
+
+                    <form onSubmit={clickSubmit}>
+                        <div className="form-group">
+                            <label className="form-label">Product Photo</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleChange('photo')}
+                                className="form-control"
+                            />
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Name</label>
+                                <input type="text" className="form-control" value={name} onChange={handleChange('name')} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Price ($)</label>
+                                <input type="number" className="form-control" value={price} onChange={handleChange('price')} required />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Description</label>
+                            <textarea className="form-control" value={description} onChange={handleChange('description')} rows={4} required />
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label className="form-label">Category</label>
+                                <select className="form-control" value={category} onChange={handleChange('category')}>
+                                    <option value="">Please select</option>
+                                    {categories.map((cat, i) => (
+                                        <option key={i} value={cat._id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Quantity</label>
+                                <input type="number" className="form-control" value={quantity} onChange={handleChange('quantity')} required />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Shipping</label>
+                            <select className="form-control" value={shipping} onChange={handleChange('shipping')}>
+                                <option value="">Please select</option>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" className="btn-primary btn-lg" disabled={isLoading}>
+                            {isLoading ? 'Creating…' : 'Create Product'}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </Layout>
-    )
+    );
 }
 
 export default AddProduct;

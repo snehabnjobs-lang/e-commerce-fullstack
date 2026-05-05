@@ -9,45 +9,45 @@ const Cart = () => {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        const items = getCart();
-        setItems(items);
+        setItems(getCart());
     }, []);
-
-    const showItems = items => {
-        return (
-            <div>
-                <h2>Your cart has {`${items.length}`} items</h2>
-                <hr />
-                {items.map((product, i) => (
-                    <ProductCard
-                        key={i}
-                        product={product}
-                        showAddToCartButton={false}
-                        cartUpdate={true}
-                        showRemoveProductButton={true}
-                    />
-                ))}
-            </div>
-        );
-    };
-
-    const noItemsMessage = () => (
-        <h2>
-            Your cart is empty. <br /> <Link to="/shop">Continue shopping</Link>
-        </h2>
-    );
 
     return (
         <Layout>
-            <div className="flex flex-row gap-5">
-                <div className="">
-                    {items.length > 0 ? showItems(items) : noItemsMessage()}
-                </div>
+            <div className="page-content">
+                <div className="cart-page">
+                    <div>
+                        <h2 className="cart-heading">
+                            Your Cart
+                            <span>{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+                        </h2>
 
-                <div className="">
-                    <h2 className="mb-4">Your cart summary</h2>
-                    <hr />
-                    <Checkout products={items} />
+                        {items.length > 0 ? (
+                            <div className="cart-list">
+                                {items.map((product, i) => (
+                                    <ProductCard
+                                        key={i}
+                                        product={product}
+                                        showAddToCartButton={false}
+                                        cartUpdate={true}
+                                        showRemoveProductButton={true}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="cart-empty">
+                                <div className="empty-icon">🛒</div>
+                                <h3 className="empty-title">Your cart is empty</h3>
+                                <p className="empty-desc">Looks like you haven't added anything yet.</p>
+                                <Link to="/shop" className="btn-primary">Continue Shopping</Link>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="cart-summary">
+                        <h3 className="summary-title">Order Summary</h3>
+                        <Checkout products={items} />
+                    </div>
                 </div>
             </div>
         </Layout>

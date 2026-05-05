@@ -11,10 +11,19 @@
 }
 
 .logo a {
-  font-size: 24px;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 800;
   text-decoration: none;
-  color: #222;
+  color: #14532d;
+  letter-spacing: -0.02em;
+}
+
+.logo-leaf {
+  font-size: 20px;
+  line-height: 1;
 }
 
 .nav-links {

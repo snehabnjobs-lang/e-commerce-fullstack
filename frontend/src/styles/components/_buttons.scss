@@ -1,0 +1,120 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ─── Base ─────────────────────────────────────
+.btn {
+  @include btn-base;
+  @include focus-ring;
+}
+
+// ─── Primary ──────────────────────────────────
+.btn-primary {
+  @include btn-base;
+  @include focus-ring;
+  background-color: var(--brand-primary);
+  color: var(--text-on-brand);
+
+  &:hover:not(:disabled) {
+    background-color: var(--brand-primary-hover);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+// ─── Secondary (outlined) ─────────────────────
+.btn-secondary {
+  @include btn-base;
+  @include focus-ring;
+  background-color: transparent;
+  color: var(--brand-primary);
+  border: 1.5px solid var(--brand-primary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--brand-primary-light);
+  }
+}
+
+// ─── Ghost ────────────────────────────────────
+.btn-ghost {
+  @include btn-base;
+  @include focus-ring;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+}
+
+// ─── Danger ───────────────────────────────────
+.btn-danger {
+  @include btn-base;
+  @include focus-ring;
+  background-color: var(--danger);
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(0.9); }
+}
+
+// ─── Success ──────────────────────────────────
+.btn-success {
+  @include btn-base;
+  @include focus-ring;
+  background-color: var(--success);
+  color: #fff;
+
+  &:hover:not(:disabled) { filter: brightness(0.9); }
+}
+
+// ─── Icon-only button ─────────────────────────
+.btn-icon {
+  @include flex-center;
+  @include focus-ring;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-md);
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--bg-surface-hover);
+    color: var(--text-primary);
+  }
+}
+
+// ─── Sizes ────────────────────────────────────
+.btn-sm { padding: 0.3125rem 0.875rem; font-size: 0.8125rem; }
+.btn-lg { padding: 0.75rem 1.75rem;   font-size: 1.0625rem; }
+.btn-xl { padding: 0.875rem 2rem;     font-size: 1.125rem;  }
+
+// ─── Full-width ───────────────────────────────
+.btn-full { width: 100%; }
+
+// ─── Loading spinner ──────────────────────────
+.btn-loading {
+  pointer-events: none;
+  position: relative;
+  color: transparent !important;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 50% 50%;
+    width: 1rem;
+    height: 1rem;
+    margin: -0.5rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

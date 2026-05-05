@@ -1,85 +1,122 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  useIsAdmin,
-  useIsRegisteredUser,
-  useIsAuthenticated,
-  useUserData,
-} from "../hooks/useAuth";
-import { signout } from "../auth";
-import "./Navbar.css";
+    useIsAdmin,
+    useIsRegisteredUser,
+    useIsAuthenticated,
+    useUserData,
+} from '../hooks/useAuth';
+import { signout } from '../auth';
+import { ThemeToggle } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
+import './Navbar.css';
 
 function Navbar() {
-  let navigate = useNavigate();
-  const isAdmin = useIsAdmin();
-  const isUser = useIsRegisteredUser();
-  const isAuthenticated = useIsAuthenticated();
-  const { user } = useUserData();
-  const _id = user?._id;
+    const navigate = useNavigate();
+    const isAdmin = useIsAdmin();
+    const isUser = useIsRegisteredUser();
+    const isAuthenticated = useIsAuthenticated();
+    const { user } = useUserData() || {};
+    const _id = user?._id;
+    const toast = useToast();
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
+    const dropdownRef = useRef(null);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
+    useEffect(() => {
+        const handler = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
-  return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="logo">
-          <Link to="/">E commerce application</Link>
-        </div>
+    const handleLogout = async () => {
+        setLoggingOut(true);
+        setDropdownOpen(false);
+        try {
+            await signout(() => {});
+            toast.success('You have been signed out. See you soon! 👋');
+            navigate('/');
+        } catch {
+            toast.error('Sign-out failed. Please try again.');
+        } finally {
+            setLoggingOut(false);
+        }
+    };
 
-        <ul className="nav-links">
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/shop">All Products</Link></li>
-          <li><Link to="/cart">Cart</Link></li>
+    return (
+        <nav className="navbar">
+            <div className="navbar-container">
+                <div className="logo">
+                    <Link to="/">
+                        <span className="logo-leaf">🌿</span> FreshRoot
+                    </Link>
+                </div>
 
-          {isUser && (
-            <li>
-              <Link to="/user/dashboard">User Dashboard</Link>
-            </li>
-          )}
+                <ul className="nav-links">
+                    <li><Link to="/">Home</Link></li>
+                    <li><Link to="/shop">All Products</Link></li>
+                    <li><Link to="/cart">Cart</Link></li>
 
-          <li className="dropdown">
-            <button onClick={toggleDropdown} className="dropdown-btn">
-              {/* <img
-                className="avatar"
-                src=""
-                alt="Profile"
-              /> */}
-              My Account
-            </button>
+                    {isUser && (
+                        <li>
+                            <Link to="/user/dashboard">User Dashboard</Link>
+                        </li>
+                    )}
 
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <Link to={`/profile/${_id}`}>My Profile</Link>
-                <Link to="/purchase-history">Purchase History</Link>
+                    <li className="dropdown" ref={dropdownRef}>
+                        <button
+                            onClick={() => setDropdownOpen(o => !o)}
+                            className="dropdown-btn"
+                            aria-expanded={dropdownOpen}
+                            aria-haspopup="true"
+                        >
+                            My Account
+                        </button>
 
-                {isAuthenticated ? (
-                  <span
-                    className="dropdown-item"
-                    onClick={() => {
-                      signout(() => {
-                        navigate("/");
-                      });
-                    }}
-                  >
-                    Sign Out
-                  </span>
-                ) : (
-                  <>
-                    <Link to="/signin">Sign In</Link>
-                    <Link to="/signup">Create Account / Sign Up</Link>
-                  </>
-                )}
-              </div>
-            )}
-          </li>
-        </ul>
-      </div>
-    </nav>
-  );
+                        {dropdownOpen && (
+                            <div className="dropdown-menu">
+                                <Link to={`/profile/${_id}`} onClick={() => setDropdownOpen(false)}>
+                                    My Profile
+                                </Link>
+                                <Link to="/purchase-history" onClick={() => setDropdownOpen(false)}>
+                                    Purchase History
+                                </Link>
+                                {isAdmin && (
+                                    <Link to="/admin/dashboard" onClick={() => setDropdownOpen(false)}>
+                                        Admin Panel
+                                    </Link>
+                                )}
+
+                                {isAuthenticated ? (
+                                    <span
+                                        className="dropdown-item"
+                                        onClick={handleLogout}
+                                        style={{ opacity: loggingOut ? 0.6 : 1, pointerEvents: loggingOut ? 'none' : 'auto' }}
+                                    >
+                                        {loggingOut ? 'Signing out…' : 'Sign Out'}
+                                    </span>
+                                ) : (
+                                    <>
+                                        <Link to="/signin" onClick={() => setDropdownOpen(false)}>Sign In</Link>
+                                        <Link to="/signup" onClick={() => setDropdownOpen(false)}>Create Account</Link>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </li>
+                </ul>
+
+                <div className="navbar-right" style={{ display: 'flex', alignItems: 'center' }}>
+                    <ThemeToggle />
+                </div>
+            </div>
+        </nav>
+    );
 }
 
 export default Navbar;

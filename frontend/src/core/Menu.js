@@ -1,37 +1,23 @@
 import React from "react";
 import { Link, useNavigate } from 'react-router-dom';
-
 import { signout } from "../auth";
 
-// import { Button, ButtonGroup } from '@chakra-ui/react'
-
 function Menu() {
-    let navigate = useNavigate();
-
-
-
+    const navigate = useNavigate();
 
     return (
-        <div>
-            <button className="btn">
-                <Link to="/"> Home</Link>
+        <nav style={{ display: 'flex', gap: '0.5rem', padding: '0.75rem 1rem' }}>
+            <Link to="/" className="btn-ghost btn-sm">Home</Link>
+            <Link to="/signin" className="btn-ghost btn-sm">Sign In</Link>
+            <Link to="/signup" className="btn-ghost btn-sm">Sign Up</Link>
+            <button
+                className="btn-danger btn-sm"
+                onClick={() => signout(() => navigate("/"))}
+            >
+                Sign Out
             </button>
-            <button className="btn">
-                <Link to="/signin"> SignIn</Link>
-            </button>
-            <button className="btn" >
-                <Link to="/signup"> SignUp</Link>
-            </button>
-            <button className="btn bg-red-500">
-                <span onClick={
-                    () => {
-                        signout(() => {
-                            navigate("/");
-                        })
-                    }}> SignOut</span>
-            </button>
-        </div>
-    )
+        </nav>
+    );
 }
 
 export default Menu;

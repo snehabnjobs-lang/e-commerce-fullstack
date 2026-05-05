@@ -1,0 +1,181 @@
+@use 'variables' as *;
+
+// ─── Responsive breakpoints ───────────────────
+@mixin sm  { @media (min-width: #{$bp-sm})  { @content; } }
+@mixin md  { @media (min-width: #{$bp-md})  { @content; } }
+@mixin lg  { @media (min-width: #{$bp-lg})  { @content; } }
+@mixin xl  { @media (min-width: #{$bp-xl})  { @content; } }
+@mixin xxl { @media (min-width: #{$bp-2xl}) { @content; } }
+
+@mixin max-sm  { @media (max-width: #{$bp-sm - 1px})  { @content; } }
+@mixin max-md  { @media (max-width: #{$bp-md - 1px})  { @content; } }
+@mixin max-lg  { @media (max-width: #{$bp-lg - 1px})  { @content; } }
+
+// ─── Layout helpers ───────────────────────────
+@mixin flex($dir: row, $align: center, $justify: flex-start, $gap: 0) {
+  display: flex;
+  flex-direction: $dir;
+  align-items: $align;
+  justify-content: $justify;
+  @if $gap != 0 { gap: $gap; }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin container {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @include sm  { padding-inline: 1.5rem; }
+  @include lg  { padding-inline: 2rem;   }
+}
+
+@mixin grid($cols: 1, $gap: 1.5rem) {
+  display: grid;
+  grid-template-columns: repeat(#{$cols}, 1fr);
+  gap: $gap;
+}
+
+// ─── Surface / card ───────────────────────────
+@mixin surface($radius: var(--radius-lg)) {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: $radius;
+  box-shadow: var(--card-shadow);
+}
+
+@mixin surface-hover {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+  }
+}
+
+// ─── Form field ───────────────────────────────
+@mixin input-base {
+  width: 100%;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &::placeholder { color: var(--input-placeholder); }
+
+  &:focus {
+    border-color: var(--input-border-focus);
+    box-shadow: var(--input-shadow-focus);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Button base ──────────────────────────────
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--transition-base), box-shadow var(--transition-base),
+              transform var(--transition-fast);
+
+  &:active { transform: scale(0.97); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+}
+
+// ─── Badge / pill ─────────────────────────────
+@mixin badge($bg: var(--badge-bg), $color: var(--badge-text)) {
+  display: inline-block;
+  background: $bg;
+  color: $color;
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+// ─── Typography helpers ───────────────────────
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@mixin section-heading {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+// ─── Visibility / interaction ─────────────────
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-ring($color: var(--border-focus)) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: 2px;
+  }
+}
+
+// ─── Scrollbar (webkit) ───────────────────────
+@mixin scrollbar($width: 6px) {
+  &::-webkit-scrollbar { width: $width; height: $width; }
+  &::-webkit-scrollbar-track { background: var(--bg-secondary); }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: var(--radius-full);
+    &:hover { background: var(--text-muted); }
+  }
+}
+
+// ─── Page section wrapper ─────────────────────
+@mixin page-section($py: 3.75rem) {
+  padding-block: $py;
+  background-color: var(--bg-secondary);
+}

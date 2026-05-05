@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Select } from "@chakra-ui/react";
 import { getCategories } from "../api/admin";
 import { listProduct } from "../api/product";
 import ProductCard from "../ui/ProductCard";
@@ -11,103 +10,60 @@ function Search() {
         search: '',
         results: [],
         searched: false
-    })
+    });
 
-    const { categories, category, search, results, searched } = data;
+    const { category, search, results, searched } = data;
 
-    const loadCategories = () => {
-        getCategories().then(_data => {
-            if (_data?.error) {
-                //
-            } else {
-                setData({ ...data, categories: _data })
-            }
-        })
-    }
     useEffect(() => {
-        loadCategories();
+        getCategories().then(_data => {
+            if (!_data?.error) setData(prev => ({ ...prev, categories: _data }));
+        });
     }, []);
-
-    const searchData = () => {
-        console.log(search, category);
-        if (search) {
-            listProduct({ search: search || undefined, category: category })
-                .then(response => {
-                    if (response?.error) {
-                        //
-                        console.log("error", response?.error);
-                    } else {
-                        setData({ ...data, results: response, searched: true });
-
-                    }
-                })
-        }
-    }
 
     const searchSubmit = (e) => {
         e.preventDefault();
-        searchData();
-    }
+        if (!search) return;
+        listProduct({ search, category: category || undefined }).then(response => {
+            if (!response?.error) {
+                setData(prev => ({ ...prev, results: response, searched: true }));
+            }
+        });
+    };
 
     const handleChange = (name) => (event) => {
-        console.log("event", event.target.value);
-        setData({ ...data, [name]: event.target.value, searched: false });
-    }
-
-    const searchForm = () => {
-        return (
-            <form onSubmit={searchSubmit} onClick={searchSubmit}>
-                <div className="flex gap-5 w-50">
-                    <Input
-                        type="search"
-                        onChange={handleChange('search')}
-                        placeholder="Search Products"
-                    />
-                    {/* <Select onChange={handleChange('category')}>
-                        <option value="all">All Categories</option>
-                        {
-                            categories?.map((category, index) => (
-                                <option
-                                    key={`c_${index}`}
-                                    value={category._id}
-                                >
-                                    {category.name}
-                                </option>
-                            ))
-                        }
-                    </Select> */}
-                    <Button>Search</Button>
-                </div>
-            </form>
-        )
-    }
-
-    const searchMessage = (searched, results) => {
-        if (searched) {
-            if (results.length > 0) {
-                return (
-                    <div>`Found {results.length} products</div>
-                )
-            } else {
-                return (
-                    <div>`No Products Found!</div>
-                )
-            }
-        }
-
-    }
+        setData(prev => ({ ...prev, [name]: event.target.value, searched: false }));
+    };
 
     return (
-        <div className="flex-row">
-            {searchForm()}
-            {searchMessage(searched, results)}
-            {results?.map((product) => (
-                <div key={product._id}>
-                    <ProductCard product={product} />
-                </div>
-            ))}
+        <div>
+            <form className="search-bar" onSubmit={searchSubmit}>
+                <svg className="search-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                </svg>
+                <input
+                    type="search"
+                    className="search-input"
+                    onChange={handleChange('search')}
+                    value={search}
+                    placeholder="Search products…"
+                />
+            </form>
+
+            {searched && (
+                <p className="text-muted" style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
+                    {results.length > 0
+                        ? `Found ${results.length} product${results.length !== 1 ? 's' : ''}`
+                        : 'No products found'}
+                </p>
+            )}
+
+            <div className="product-grid" style={{ marginTop: '1.5rem' }}>
+                {results.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                ))}
+            </div>
         </div>
-    )
+    );
 }
 
 export default Search;

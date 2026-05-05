@@ -1,0 +1,130 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ─── Auth wrapper (full-height center) ────────
+.auth-page {
+  min-height: 100vh;
+  background-color: var(--bg-secondary);
+  @include flex(column, center, center);
+  padding: 2rem 1rem;
+}
+
+// ─── Auth card ────────────────────────────────
+.auth-card {
+  @include surface;
+  width: 100%;
+  max-width: 26rem;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ─── Auth header ──────────────────────────────
+.auth-header {
+  text-align: center;
+
+  .auth-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .auth-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .auth-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.375rem;
+    line-height: 1.5;
+  }
+}
+
+// ─── Form ─────────────────────────────────────
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ─── Divider "or" ─────────────────────────────
+.auth-divider {
+  @include flex($gap: 0.75rem);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-color);
+  }
+}
+
+// ─── OAuth / social buttons ───────────────────
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.oauth-btn {
+  @include btn-base;
+  @include focus-ring;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
+  width: 100%;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+  }
+
+  img { width: 1.25rem; height: 1.25rem; }
+}
+
+// ─── Footer links ─────────────────────────────
+.auth-footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+
+  a {
+    color: var(--brand-primary);
+    font-weight: 600;
+    margin-left: 0.25rem;
+    transition: color var(--transition-fast);
+
+    &:hover { color: var(--brand-primary-hover); }
+  }
+}
+
+// ─── Alert / error banner ─────────────────────
+.auth-alert {
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  @include flex($gap: 0.5rem);
+
+  &.error {
+    background-color: var(--badge-danger-bg);
+    color: var(--badge-danger-text);
+  }
+
+  &.success {
+    background-color: var(--badge-success-bg);
+    color: var(--badge-success-text);
+  }
+}

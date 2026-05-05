@@ -6,39 +6,36 @@ function PurchaseHistory() {
 
     useEffect(() => {
         getPurchaseHistory().then((data) => {
-            setHistory(data);
-        })
-    }, [])
+            if (data && !data.error) setHistory(data);
+        });
+    }, []);
+
+    if (!history.length) {
+        return (
+            <div className="empty-state">
+                <p className="empty-title">No orders yet</p>
+                <p className="empty-desc">Your completed orders will appear here.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="card mb-5">
-            <h3 className="card-header">Purchase history</h3>
-            <ul className="list-group">
-                <li className="list-group-item">
-                    {history?.map((h, i) => {
-                        return (
-                            <div>
-                                <hr />
-                                {h?.products.map((p, i) => {
-                                    return (
-                                        <div key={i}>
-                                            <h6>Product name: {p.name}</h6>
-                                            <h6>Product price: ${p.price}</h6>
-                                            <h6>
-                                                Purchased date:{" "}
-                                                {p.createdAt}
-                                                {/* {moment(p.createdAt).fromNow()} */}
-                                            </h6>
-                                        </div>
-                                    );
-                                })}
+        <div className="order-history">
+            {history.map((order, i) => (
+                <div key={i}>
+                    {order?.products?.map((p, j) => (
+                        <div key={j} className="order-row">
+                            <div className="order-info">
+                                <span className="order-name">{p.name}</span>
+                                <span className="order-date">{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</span>
                             </div>
-                        );
-                    })}
-                </li>
-            </ul>
+                            <span className="order-total">${p.price}</span>
+                        </div>
+                    ))}
+                </div>
+            ))}
         </div>
     );
-};
+}
 
 export default PurchaseHistory;
