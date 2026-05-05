@@ -3,9 +3,10 @@
 A production-ready, scalable e-commerce application built using the MERN stack.  
 Designed with a modular architecture, secure authentication, and optimized frontend performance.
 
-🔗 **Live Demo:** ''  
-🔗 **API Base URL:** ''  
-Home page - /
+🔗 **Live Demo:** https://e-commerce-fullstack-zeta.vercel.app/  
+🔗 **API Base URL:** https://mern-fullstack-application-1.onrender.com/api
+Home page - https://e-commerce-fullstack-zeta.vercel.app/ 
+SignIn Page - 
 
 
 ---
