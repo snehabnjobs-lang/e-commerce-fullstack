@@ -17,19 +17,19 @@ const UserProfile = ({ user = {} }) => {
 
     const { name, email, password, success } = values;
 
-    const init = useCallback(userId => {
+    const init = useCallback(() => {
         getUser(userId).then(data => {
-            if (data.error) {
+            if (data?.error) {
                 setValues(v => ({ ...v, error: true }));
             } else {
                 setValues(v => ({ ...v, name: data.name, email: data.email }));
             }
         });
-    }, [userId])
+    }, [userId]);
 
     useEffect(() => {
         if (userId) {
-            init(userId);
+            init();
         }
     }, [userId, init]);
 
