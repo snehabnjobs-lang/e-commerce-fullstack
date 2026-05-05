@@ -52,7 +52,7 @@ export const updateItem = (productId, count) => {
             cart = JSON.parse(localStorage.getItem("cart"));
         }
 
-        cart.map((product, i) => {
+        cart.forEach((product, i) => {
             if (product._id === productId) {
                 cart[i].count = count;
             }
@@ -69,7 +69,7 @@ export const removeItem = productId => {
             cart = JSON.parse(localStorage.getItem("cart"));
         }
 
-        cart.map((product, i) => {
+        cart.forEach((product, i) => {
             if (product._id === productId) {
                 cart.splice(i, 1);
             }

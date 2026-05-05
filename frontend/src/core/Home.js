@@ -27,7 +27,7 @@ function Home() {
         }).catch(() => {
             toast.error('Failed to connect to the server. Please try again.');
         }).finally(() => setLoading(false));
-    }, []);
+    }, [toast]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <Layout>

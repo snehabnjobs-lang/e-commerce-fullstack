@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Layout from "../core/Layout";
-import { isAuthenticated } from "../auth";
 import { useParams, Navigate } from "react-router-dom";
 import { getUser, update, updateUser } from "../api/user";
 
@@ -16,15 +15,14 @@ const UserProfile = ({ user = {} }) => {
 
     const { userId } = useParams();
 
-    const { name, email, password, error, success } = values;
+    const { name, email, password, success } = values;
 
     const init = useCallback(userId => {
-        // console.log(userId);
         getUser(userId).then(data => {
             if (data.error) {
-                setValues({ ...values, error: true });
+                setValues(v => ({ ...v, error: true }));
             } else {
-                setValues({ ...values, name: data.name, email: data.email });
+                setValues(v => ({ ...v, name: data.name, email: data.email }));
             }
         });
     }, [userId])

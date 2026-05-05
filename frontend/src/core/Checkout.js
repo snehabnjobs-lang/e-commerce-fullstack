@@ -42,8 +42,6 @@ const Checkout = ({ products }) => {
         );
     };
 
-    let deliveryAddress = data.address;
-
     const handlePayment = async () => {
 
         const createOrderData = {

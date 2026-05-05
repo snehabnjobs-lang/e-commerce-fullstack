@@ -54,8 +54,8 @@ function Shop() {
 
     useEffect(() => {
         loadCategories();
-        loadFilteredResults(filters.filters);
-    }, [loadCategories]);
+        loadFilteredResults(filters.filters); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [loadCategories]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleFilters = (selectedValues, filterBy = 'category') => {
         const newFilters = { ...filters };
