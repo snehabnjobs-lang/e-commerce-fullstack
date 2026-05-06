@@ -101,7 +101,7 @@ const Checkout = ({ products = [] }) => {
             const { order, success: orderSuccess } = data;
 
             const options = {
-                key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+                key: import.meta.env.RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency,
                 name: "FreshRoot",

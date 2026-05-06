@@ -53,7 +53,7 @@ const ProductCard = ({ product, showAddToCartButton = true,
 
   <div className="product-card-footer">
     <span className="product-price">
-      ${product.price}
+      ₹{product.price}
     </span>
 
     {showAddToCartButton && (
