@@ -1,367 +1,234 @@
 const { errorHandler } = require('../helpers/dbErrorHandler');
 const Product = require('../models/product');
-const { formidable } = require('formidable')
+const { formidable } = require('formidable');
 const _ = require('lodash');
-const fs = require('fs');
+const sharp = require('sharp');
 
+// Compress uploaded image: resize to max 800px wide, convert to JPEG q=80
+async function compressImage(filepath) {
+    const buffer = await sharp(filepath)
+        .resize({ width: 800, withoutEnlargement: true })
+        .jpeg({ quality: 80, progressive: true })
+        .toBuffer();
+    return buffer;
+}
 
 exports.productById = async (req, res, next, id) => {
     try {
         const product = await Product.findById(id).exec();
-        if (!product) {
-            throw 'Product not found'
-        }
-        console.log("product", product);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
         req.product = product;
         next();
+    } catch (err) {
+        return res.status(400).json({ error: err });
     }
-
-    catch (err) {
-        return res.status(400).json({
-            error: err
-        })
-    }
-}
+};
 
 exports.read = (req, res) => {
-    // Send image seperately bcz images are huge
     req.product.photo = undefined;
     res.json(req.product);
-}
+};
 
 exports.create = (req, res) => {
     try {
         const form = formidable({ multiples: true });
         form.keepExtensions = true;
 
-        form.parse(req, (err, fields, files) => {
-            if (err) {
-                return res.status(400).json({
-                    error: 'Image could not be uploaded'
-                })
-            }
+        form.parse(req, async (err, fields, files) => {
+            if (err) return res.status(400).json({ error: 'Image could not be uploaded' });
 
-            // Iterate over the fields
             const _fields = {};
-            Object.keys(fields).forEach(key => {
-                _fields[key] = fields[key][0];
-            })
+            Object.keys(fields).forEach(key => { _fields[key] = fields[key][0]; });
 
-            //check for all fields
-            const { name, description, price, category, quantity, shipping } = _fields
-
+            const { name, description, price, category, quantity, shipping } = _fields;
             if (!name || !description || !price || !category || !quantity || !shipping) {
-                return res.status(400).json({
-                    error: "All fields are required"
-                });
+                return res.status(400).json({ error: 'All fields are required' });
             }
 
-            Product.create(_fields).then((createdProduct) => {
+            try {
+                const createdProduct = await Product.create(_fields);
+
                 if (files.photo) {
-
-                    console.log("FILES PHOTO: ", files.photo[0].filepath);
-                    if (files.photo.size > 1000000) { // 1kb = 1000, 1mb = 1000000
-                        return res.status(400).json({
-                            error: "Image should be less than 1mb in size",
-                        });
+                    const photo = files.photo[0];
+                    if (photo.size > 1000000) {
+                        await Product.findByIdAndDelete(createdProduct._id);
+                        return res.status(400).json({ error: 'Image should be less than 1mb in size' });
                     }
-                    // Read the file and save it to the database
-                    try {
-                        createdProduct.photo.data = fs.readFileSync(files.photo[0].filepath); // Correct property is 'filepath'
-                        createdProduct.photo.contentType = files.photo[0].mimetype; // Correct property is 'mimetype'
-                    } catch (error) {
-                        console.log("error", error)
-                        return res.status(500).json({
-                            error: "Failed to read the file.",
-                        });
-                    }
+                    createdProduct.photo.data = await compressImage(photo.filepath);
+                    createdProduct.photo.contentType = 'image/jpeg';
                 }
-                createdProduct.save()
-                    .then((result) => {
-                        res.json({ result, data: "Successfully created" });
-                    })
-                    .catch((err) => {
-                        throw err;
-                    })
-            })
 
-        })
-    }
-    catch (err) {
-        console.log('Product creation error: ', err);
-        return res.status(500).json({
-            error: 'An unexpected error occurred during product creation.',
+                const result = await createdProduct.save();
+                res.json({ result, data: 'Successfully created' });
+            } catch (innerErr) {
+                console.error('Product creation error:', innerErr);
+                return res.status(500).json({ error: 'An unexpected error occurred during product creation.' });
+            }
         });
+    } catch (err) {
+        console.error('Product creation error:', err);
+        return res.status(500).json({ error: 'An unexpected error occurred during product creation.' });
     }
-}
+};
 
-exports.remove = (req, res) => {
-    console.log("req", req);
+exports.remove = async (req, res) => {
     try {
-        Product.findByIdAndDelete(req.params.productId);
-        res.json({
-            "message": "Product deleted successfully"
-        })
-
+        await Product.findByIdAndDelete(req.params.productId);
+        res.json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        return res.status(400).json({ error: errorHandler(err) });
     }
-    catch (err) {
-        console.log("delete err", err);
-        return res.status(400).json({
-            error: errorHandler(err)
-        });
-    }
-}
+};
 
 exports.update = async (req, res) => {
     try {
         const form = formidable({ multiples: true });
         form.keepExtensions = true;
 
-        form.parse(req, (err, fields, files) => {
-            if (err) {
-                return res.status(400).json({
-                    error: 'Image could not be uploaded'
-                })
-            }
+        form.parse(req, async (err, fields, files) => {
+            if (err) return res.status(400).json({ error: 'Image could not be uploaded' });
 
-            // Iterate over the fields
             const _fields = {};
-            Object.keys(fields).forEach(key => {
-                _fields[key] = fields[key][0];
-            })
+            Object.keys(fields).forEach(key => { _fields[key] = fields[key][0]; });
 
-            //check for all fields
-            const { name, description, price, category, quantity, shipping } = _fields
-
+            const { name, description, price, category, quantity, shipping } = _fields;
             if (!name || !description || !price || !category || !quantity || !shipping) {
-                return res.status(400).json({
-                    error: "All fields are required"
-                });
+                return res.status(400).json({ error: 'All fields are required' });
             }
 
             let product = req.product;
             product = _.extend(product, _fields);
 
-            if (files.photo) {
-                console.log("FILES PHOTO: ", files.photo[0]);
-                if (files.photo.size > 1000000) { // 1kb = 1000, 1mb = 1000000
-                    return res.status(400).json({
-                        error: "Image should be less than 1mb in size",
-                    });
+            try {
+                if (files.photo) {
+                    const photo = files.photo[0];
+                    if (photo.size > 1000000) {
+                        return res.status(400).json({ error: 'Image should be less than 1mb in size' });
+                    }
+                    product.photo.data = await compressImage(photo.filepath);
+                    product.photo.contentType = 'image/jpeg';
                 }
-                // Read the file and save it to the database
-                try {
-                    createdProduct.photo.data = fs.readFileSync(files.photo[0].filepath); // Correct property is 'filepath'
-                    createdProduct.photo.contentType = files.photo[0].mimetype; // Correct property is 'mimetype'
-                } catch (error) {
-                    return res.status(500).json({
-                        error: "Failed to read the file.",
-                    });
-                }
+
+                const result = await product.save();
+                res.json({ result });
+            } catch (innerErr) {
+                console.error('Product update error:', innerErr);
+                return res.status(400).json({ error: errorHandler(innerErr) });
             }
-
-            product.save()
-                .then((result) => {
-                    res.json({ result });
-                })
-                .catch((err) => {
-                    throw err;
-                })
-
-
-        })
+        });
+    } catch (err) {
+        console.error('Product update error:', err);
+        return res.status(400).json({ error: errorHandler(err) });
     }
-    catch (err) {
-        console.log("product update err===>", err);
-        return res.status(400).json({
-            error: errorHandler(err)
-        })
-    }
-}
+};
 
-/**
- * sell / arrival
- * show the most popular products
- * By sell - /products?sortBy=sold&order=desc&limit=4
- * 
- * show new arrival seperately
- * By arrival - /products?sortBy=createdAt&order=desc&limit=4
- * 
- * if no params are sent then all products are returned
- */
 exports.list = (req, res) => {
-    let order = req.query.order || 'desc';
-    let sortBy = req.query.sortBy || '_id';
-    let limit = req.query.limit || 6;
+    const order  = req.query.order   || 'desc';
+    const sortBy = req.query.sortBy  || '_id';
+    const limit  = parseInt(req.query.limit) || 6;
 
-    const allProductsPromise = Product.find().select("-photo")
+    Product.find()
+        .select('-photo')
         .populate('category')
         .sort([[sortBy, order]])
         .limit(limit)
-        .exec();
-
-    allProductsPromise
-        .then((data) => {
-            res.status(200).send({ data });
-        })
-        .catch((err) => {
-            console.log("err", err);
-            res.status(400).json({
-                error: errorHandler(err)
-            })
-        })
+        .lean()
+        .exec()
+        .then(data => res.status(200).json({ data }))
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
 };
 
-/**
- * It will find the products based on the req product category
- * Other products that has the same category, will be returned
- */
 exports.listRelated = (req, res) => {
-    let limit = req.query.limit || 6;
+    const limit = parseInt(req.query.limit) || 6;
 
-    const relatedProductsPromise = Product.find({ _id: { $ne: req.product }, category: req.product.category })
-        .select("-photo")
+    Product.find({ _id: { $ne: req.product._id }, category: req.product.category })
+        .select('-photo')
         .populate('category', '_id name')
         .limit(limit)
-        .exec();
-
-    relatedProductsPromise
-        .then((products) => {
-            res.status(200).send({ products });
-        })
-        .catch((err) => {
-
-            return res.status(400).json({
-                error: err || "Product not found"
-            })
-        })
+        .lean()
+        .exec()
+        .then(products => res.status(200).json({ products }))
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
 };
 
 exports.listCategories = (req, res) => {
-    Product.distinct("category", {}).then((data) => {
-        res.json({ data })
-    })
-        .catch((err) => {
-            return res.status(400).json({
-                error: err || "Product categories not found"
-            })
-        })
-}
-
-/**
- * list products by search
- * we will implement product search in react frontend
- * we will show categories in checkbox and price range in radio buttons
- * as the user clicks on those checkbox and radio buttons
- * we will make api request and show the products to users based on what he wants
- */
+    Product.distinct('category', {})
+        .then(data => res.json({ data }))
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
+};
 
 exports.listBySearch = (req, res) => {
-    let order = req.body.order || "desc";
-    let sortBy = req.body.sortBy || "_id";
-    let limit = req.body.limit || 100;
-    let skip = parseInt(req.body.skip);
-    let findArgs = {};
+    const order  = req.body.order   || 'desc';
+    const sortBy = req.body.sortBy  || '_id';
+    const limit  = parseInt(req.body.limit) || 100;
+    const skip   = parseInt(req.body.skip)  || 0;
+    const findArgs = {};
 
-    // console.log(order, sortBy, limit, skip, req.body.filters);
-    // console.log("findArgs", findArgs);
-
-    for (let key in req.body.filters) {
+    for (const key in req.body.filters) {
         if (req.body.filters[key].length > 0) {
-            if (key === "price") {
-                // gte -  greater than price [0-10]
-                // lte - less than
-                findArgs[key] = {
-                    $gte: req.body.filters[key][0],
-                    $lte: req.body.filters[key][1]
-                };
-            } else {
-                findArgs[key] = req.body.filters[key];
-            }
+            findArgs[key] = key === 'price'
+                ? { $gte: req.body.filters[key][0], $lte: req.body.filters[key][1] }
+                : req.body.filters[key];
         }
     }
 
-    const productsPromise = Product.find(findArgs)
-        .select("-photo")
-        .populate("category")
+    Product.find(findArgs)
+        .select('-photo')
+        .populate('category')
         .sort([[sortBy, order]])
         .skip(skip)
         .limit(limit)
-        .exec();
-
-    productsPromise
-        .then((data) => {
-            res.json({
-                size: data.length,
-                data
-            });
-        })
-        .catch((err) => {
-            return res.status(400).json({
-                error: err || "Products not found"
-            });
-        })
+        .lean()
+        .exec()
+        .then(data => res.json({ size: data.length, data }))
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
 };
 
+// Serve photo with strong HTTP caching (ETag + Cache-Control)
 exports.photo = (req, res, next) => {
-    if (req.product?.photo?.data) {
-        res.set('Content-Type', req.product.photo.contentType)
-        return res.send(req.product.photo.data)
+    if (!req.product?.photo?.data) return next();
+
+    const etag = `"${req.product._id}-${req.product.updatedAt?.getTime()}"`;
+
+    if (req.headers['if-none-match'] === etag) {
+        return res.status(304).end();
     }
-    next();
-}
+
+    res.set({
+        'Content-Type':  req.product.photo.contentType,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'ETag':          etag,
+        'Last-Modified': req.product.updatedAt?.toUTCString(),
+        'Vary':          'Accept-Encoding',
+    });
+    return res.send(req.product.photo.data);
+};
 
 exports.listSearch = (req, res) => {
-    // create query object to hold search value and category value
-    const query = {};
-    // assign search value to query.name
-    if (req.query.search) {
-        query.name = { $regex: req.query.search, $options: 'i' }
-        // asseign category value to query.category 
-        if (req.query.category && req.query.category !== 'All') {
-            query.category = req.query.category;
-        }
-        // find the prodducts based on query object with 2 properties
-        // Search and category
-        Product.find(query)
-            .select("-photo")
-            .then((products) => {
-                res.json(products)
-            })
-            .catch((err) => {
-                return res.status(400).json({
-                    error: err
-                })
-            })
+    if (!req.query.search) return res.json([]);
+
+    const query = { name: { $regex: req.query.search, $options: 'i' } };
+    if (req.query.category && req.query.category !== 'All') {
+        query.category = req.query.category;
     }
 
-}
+    Product.find(query)
+        .select('-photo')
+        .limit(20)
+        .lean()
+        .then(products => res.json(products))
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
+};
 
 exports.decreaseQuantity = (req, res, next) => {
-    let bulkOps = req.body.order.products.map((item) => {
-        return {
-            updateOne: {
-                filter: {
-                    _id: item._id
-                },
-                update: {
-                    $inc:
-                    {
-                        quantity: -item.count,
-                        sold: +item.count
-                    }
-                }
-            }
-        }
-    })
+    const bulkOps = req.body.order.products.map(item => ({
+        updateOne: {
+            filter: { _id: item._id },
+            update: { $inc: { quantity: -item.count, sold: +item.count } },
+        },
+    }));
 
     Product.bulkWrite(bulkOps, {})
-        .then((data) => {
-            next();
-        })
-        .catch((err) => {
-            return res.status(400).json({
-                error: err
-            })
-        })
-}
+        .then(() => next())
+        .catch(err => res.status(400).json({ error: errorHandler(err) }));
+};

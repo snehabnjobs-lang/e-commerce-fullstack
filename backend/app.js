@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 const dotenv = require('dotenv');
 const cors = require("cors");
 
@@ -32,11 +32,11 @@ mongoose.connection.on('error', err => {
 });
 
 //middlewares
+app.use(compression());
 app.use(morgan('dev'));
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use(express.json()); // Parses incoming requests with JSON payloads
 
 //routes middleware
 app.use("/api", authRoutes);

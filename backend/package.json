@@ -28,6 +28,7 @@
     "mongoose-timestamp": "^0.6.0",
     "morgan": "^1.10.0",
     "razorpay": "^2.9.4",
+    "sharp": "^0.34.5",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

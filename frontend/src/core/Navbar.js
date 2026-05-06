@@ -64,7 +64,7 @@ function Navbar() {
 
                     {isUser && (
                         <li>
-                            <Link to="/user/dashboard">User Dashboard</Link>
+                            <Link to="/user/dashboard">My Dashboard</Link>
                         </li>
                     )}
 
@@ -75,16 +75,17 @@ function Navbar() {
                             aria-expanded={dropdownOpen}
                             aria-haspopup="true"
                         >
-                            My Account
+                         More
                         </button>
 
                         {dropdownOpen && (
                             <div className="dropdown-menu">
+                                <Link to="/user/dashboard"> My Account</Link>
                                 <Link to={`/profile/${_id}`} onClick={() => setDropdownOpen(false)}>
                                     My Profile
                                 </Link>
                                 <Link to="/purchase-history" onClick={() => setDropdownOpen(false)}>
-                                    Purchase History
+                                    Order History
                                 </Link>
                                 {isAdmin && (
                                     <Link to="/admin/dashboard" onClick={() => setDropdownOpen(false)}>

@@ -31,6 +31,9 @@ const OrderSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+OrderSchema.index({ user: 1 });
+OrderSchema.index({ createdAt: -1 });
+
 const Order = mongoose.model("Order", OrderSchema);
 
 module.exports = { Order, CartItem };

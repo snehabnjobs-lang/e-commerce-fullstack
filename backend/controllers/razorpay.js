@@ -9,7 +9,7 @@ const razorpayInstance = new Razorpay({
 
 
 module.exports.createOrder = async (req, res) => {
-    console.log("creaing payment");
+    console.log("creating payment", req.body);
     const { amount, currency, receipt } = req.body;
 
     try {

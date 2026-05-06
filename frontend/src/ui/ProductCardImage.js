@@ -9,6 +9,8 @@ function ProductCardImage({ product, url }) {
         src={`${API}/products/photo/${product._id}`}
         alt={product.name}
         className="product-image"
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );

@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { addItem } from '../utils/cartHelpers';
 import { API } from '../utils/config';
+import { ProductGridSkeleton } from './ProductCardSkeleton';
 
 const AUTOPLAY_MS = 3800;
 
-const CarouselCard = ({ product }) => {
+const CarouselCard = ({ product, renderBadge }) => {
   const [added, setAdded] = useState(false);
 
   const handleAdd = (e) => {
@@ -25,9 +26,7 @@ const CarouselCard = ({ product }) => {
           className="bs-card-img"
           loading="lazy"
         />
-        {product.sold > 0 && (
-          <span className="bs-card-sold-badge">🔥 {product.sold} sold</span>
-        )}
+        {renderBadge}
       </div>
 
       <div className="bs-card-body">
@@ -51,9 +50,9 @@ const CarouselCard = ({ product }) => {
   );
 };
 
-const BestSellersCarousel = ({ products = [] }) => {
+const Carousel = ({ products = [], isLoading, eyebrow, title, renderBadge }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(3);
+  const [itemsPerView, setItemsPerView] = useState(4);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const timerRef = useRef(null);
@@ -63,7 +62,7 @@ const BestSellersCarousel = ({ products = [] }) => {
     const update = () => {
       if (window.innerWidth < 640)       setItemsPerView(1);
       else if (window.innerWidth < 1024) setItemsPerView(2);
-      else                               setItemsPerView(3);
+      else                               setItemsPerView(4);
     };
     update();
     window.addEventListener('resize', update);
@@ -102,6 +101,21 @@ const BestSellersCarousel = ({ products = [] }) => {
     startTimer();
   };
 
+  if(isLoading) {
+    return (
+        <section className="bs-section">
+            <div className="bs-container">
+                <div className="bs-header">
+                    <div className="bs-header-left">
+                        <span className="skeleton-line w-50" style={{ height: '0.75rem', display: 'block', marginBottom: '0.5rem' }} />
+                        <span className="skeleton-line w-75" style={{ height: '1.5rem', display: 'block' }} />
+                    </div>
+                </div>
+                <ProductGridSkeleton count={4} />
+            </div>
+        </section>
+    )
+  }
   if (!products.length) return null;
 
   const translateX = -(currentIndex * (100 / itemsPerView));
@@ -113,8 +127,8 @@ const BestSellersCarousel = ({ products = [] }) => {
         {/* ── Section header ── */}
         <div className="bs-header">
           <div className="bs-header-left">
-            <span className="bs-eyebrow">Top Picks</span>
-            <h2 className="bs-title">Best Sellers</h2>
+            <span className="bs-eyebrow">{eyebrow}</span>
+            <h2 className="bs-title">{title}</h2>
           </div>
           <div className="bs-nav-arrows">
             <button
@@ -160,7 +174,7 @@ const BestSellersCarousel = ({ products = [] }) => {
                 className="bs-slide"
                 style={{ flex: `0 0 ${100 / itemsPerView}%` }}
               >
-                <CarouselCard product={product} />
+                <CarouselCard product={product} renderBadge={renderBadge}/>
               </div>
             ))}
           </div>
@@ -184,4 +198,4 @@ const BestSellersCarousel = ({ products = [] }) => {
   );
 };
 
-export default BestSellersCarousel;
+export default Carousel;

@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState, useRef } from "react";
 import { listRelatedProducts } from '../api/product';
 
-import ProductCard from "../ui/ProductCard";
+import Carousel from '../ui/Carousel';
 
 function RelatedProducts({ productId }) {
     const [products, setProducts] = useState([]);
@@ -21,17 +21,16 @@ function RelatedProducts({ productId }) {
             isInitialMount.current = false; // Set to false after the first call
         } else if (productId) {
             loadProducts();
-
         }
     }, [productId, loadProducts]);
 
     return (
-        <div>
-            <p>Related Products</p>
-            {products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-            ))}
-        </div>
+        <Carousel
+            products={products}
+            title="Related Products"
+            isLoading={false}
+        />
+        
     )
 }
 
